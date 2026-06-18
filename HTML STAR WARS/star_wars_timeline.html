@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore a linha do tempo cronológica da galáxia de Star Wars, desde a Antiga República até a queda da Primeira Ordem.">
+    <title>Cronologia Star Wars - A Linha do Tempo Galáctica</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #030712;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --jedi-blue: #00d2ff;
+            --sith-red: #ff0055;
+            --rebel-green: #39ff14;
+            --republic-gold: #ffe81f;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Header / Hero Section */
+        header {
+            text-align: center;
+            padding: 60px 20px 40px 20px;
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 3rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--republic-gold);
+            text-shadow: 0 0 10px rgba(255, 232, 31, 0.6), 0 0 30px rgba(255, 232, 31, 0.3);
+            margin-bottom: 10px;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 232, 31, 0.5), 0 0 20px rgba(255, 232, 31, 0.2);
+            }
+            to {
+                text-shadow: 0 0 15px rgba(255, 232, 31, 0.8), 0 0 35px rgba(255, 232, 31, 0.4);
+            }
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+        }
+
+        /* Era Filter Buttons */
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 50px;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active[data-era="all"] {
+            border-color: var(--text-primary);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .filter-btn.active[data-era="prequel"] {
+            border-color: var(--jedi-blue);
+            color: var(--jedi-blue);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+
+        .filter-btn.active[data-era="original"] {
+            border-color: var(--sith-red);
+            color: var(--sith-red);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+        }
+
+        .filter-btn.active[data-era="sequel"] {
+            border-color: var(--rebel-green);
+            color: var(--rebel-green);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+        }
+
+        /* Timeline Area */
+        .timeline-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Central Line */
+        .timeline-container::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--jedi-blue), var(--sith-red), var(--rebel-green));
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Timeline Items */
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            background-color: transparent;
+            width: 50%;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Alternating left and right */
+        .timeline-item.left {
+            left: 0;
+        }
+
+        .timeline-item.right {
+            left: 50%;
+        }
+
+        /* Dot Indicators on Central Line */
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: var(--bg-color);
+            border: 4px solid var(--republic-gold);
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item.right::after {
+            left: -10px;
+        }
+
+        /* Color-code dots based on era */
+        .timeline-item[data-era="prequel"]::after {
+            border-color: var(--jedi-blue);
+            box-shadow: 0 0 10px var(--jedi-blue);
+        }
+
+        .timeline-item[data-era="original"]::after {
+            border-color: var(--sith-red);
+            box-shadow: 0 0 10px var(--sith-red);
+        }
+
+        .timeline-item[data-era="sequel"]::after {
+            border-color: var(--rebel-green);
+            box-shadow: 0 0 10px var(--rebel-green);
+        }
+
+        /* Card Styles (Glassmorphism) */
+        .timeline-content {
+            padding: 24px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: relative;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .timeline-content:hover {
+            transform: scale(1.03);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Glowing border on hover depending on Era */
+        .timeline-item[data-era="prequel"] .timeline-content:hover {
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.25);
+            border-color: var(--jedi-blue);
+        }
+
+        .timeline-item[data-era="original"] .timeline-content:hover {
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.25);
+            border-color: var(--sith-red);
+        }
+
+        .timeline-item[data-era="sequel"] .timeline-content:hover {
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.25);
+            border-color: var(--rebel-green);
+        }
+
+        /* Date Indicator */
+        .date {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .timeline-item[data-era="prequel"] .date {
+            color: var(--jedi-blue);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+        }
+
+        .timeline-item[data-era="original"] .date {
+            color: var(--sith-red);
+            border: 1px solid rgba(255, 0, 85, 0.3);
+        }
+
+        .timeline-item[data-era="sequel"] .date {
+            color: var(--rebel-green);
+            border: 1px solid rgba(57, 255, 20, 0.3);
+        }
+
+        /* Title & Description */
+        .timeline-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .timeline-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .timeline-container::after {
+                left: 31px;
+            }
+
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+
+            .timeline-item.right {
+                left: 0;
+            }
+
+            .timeline-item::after {
+                left: 21px;
+                right: auto;
+            }
+
+            .timeline-item.right::after {
+                left: 21px;
+            }
+
+            .logo {
+                font-size: 2.2rem;
+            }
+        }
+
+        /* Footer styling */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 50px;
+        }
+
+        footer span {
+            color: var(--republic-gold);
+        }
+
+        /* Image & Media Styles */
+        .media-container {
+            position: relative;
+            width: 100%;
+            margin: 16px 0 12px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .media-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .media-container:hover img {
+            transform: scale(1.05);
+        }
+
+        .media-container.video {
+            background-color: rgba(0, 0, 0, 0.3);
+            aspect-ratio: 16 / 9;
+        }
+
+        .media-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+        }
+
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: var(--bg-color);
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .media-container:hover .play-icon {
+            background: rgba(255, 255, 255, 1);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 0, 0, 0.7);
+            transform: rotate(90deg);
+        }
+
+        /* Badge/Tag Styles */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            margin: 4px 4px 0 0;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge-character {
+            background: rgba(0, 210, 255, 0.2);
+            color: var(--jedi-blue);
+            border: 1px solid var(--jedi-blue);
+        }
+
+        .badge-event {
+            background: rgba(255, 0, 85, 0.2);
+            color: var(--sith-red);
+            border: 1px solid var(--sith-red);
+        }
+
+        /* Gallery Section */
+        .gallery-section {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .gallery-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--republic-gold);
+            text-shadow: 0 0 10px rgba(255, 232, 31, 0.3);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            aspect-ratio: 1;
+            background: var(--card-bg);
+        }
+
+        .gallery-item:hover {
+            border-color: var(--republic-gold);
+            box-shadow: 0 0 20px rgba(255, 232, 31, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-item-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 3;
+        }
+
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+        }
+
+        .gallery-item-title {
+            color: var(--republic-gold);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        /* Expandable Content */
+        .timeline-content.expandable {
+            cursor: pointer;
+        }
+
+        .timeline-content.expandable::after {
+            content: "▼";
+            float: right;
+            transition: transform 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .timeline-content.expandable.expanded::after {
+            transform: rotate(180deg);
+        }
+
+        .expanded-content {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-content.expandable.expanded .expanded-content {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .expanded-content p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(255, 232, 31, 0.05);
+            border-left: 3px solid var(--republic-gold);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .info-box strong {
+            color: var(--republic-gold);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 class="logo" id="main-title">A Linha do Tempo Galáctica</h1>
+        <p>Explore os momentos cruciais da história principal de Star Wars, ordenados cronologicamente em BBY (Antes da Batalha de Yavin) e ABY (Depois da Batalha de Yavin).</p>
+        
+        <div class="filters" role="group" aria-label="Filtro de Eras">
+            <button class="filter-btn active" data-era="all" id="btn-all">Todas as Eras</button>
+            <button class="filter-btn" data-era="prequel" id="btn-prequel">A Era da República (Prequels)</button>
+            <button class="filter-btn" data-era="original" id="btn-original">A Era do Império (Clássica)</button>
+            <button class="filter-btn" data-era="sequel" id="btn-sequel">A Era da Resistência (Sequels)</button>
+        </div>
+    </header>
+
+    <main class="timeline-container" id="timeline">
+        <!-- Event 1: Antiga República -->
+        <div class="timeline-item left visible" data-era="prequel" id="event-1">
+            <div class="timeline-content expandable">
+                <span class="date">~25.000 BBY</span>
+                <h3>Fundação da República e dos Jedi</h3>
+                <div class="media-container">
+                    <img src="images/Republica.png" alt="Antigua República" style="object-fit: cover;">
+                </div>
+                <div class="badge badge-event">Evento Histórico</div>
+                <p>O estabelecimento da República Galáctica e a união dos Cavaleiros Jedi como protetores da paz inauguram mil gerações de estabilidade e harmonia democrática na galáxia.</p>
+                <div class="expanded-content">
+                    <p><strong>Localização:</strong> Coruscant - Capital da República</p>
+                    <p><strong>Personagens Importantes:</strong> Mestres Jedi Antigos</p>
+                    <div class="info-box">Período de ouro da Ordem Jedi com 10.000 membros protegendo a galáxia.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event 2: Ameaça Fantasma -->
+        <div class="timeline-item right visible" data-era="prequel" id="event-2">
+            <div class="timeline-content expandable">
+                <span class="date">32 BBY</span>
+                <h3>A Crise de Naboo</h3>
+                <div class="media-container">
+                    <img src="images/Naboo.png" alt="Naboo" style="object-fit: cover;">
+                </div>
+                <div class="badge badge-character">Anakin Skywalker</div>
+                <div class="badge badge-character">Palpatine</div>
+                <p>O bloqueio da Federação do Comércio desencadeia eventos que revelam o garoto Anakin Skywalker, o ressurgimento misterioso dos Sith e os primeiros passos de Palpatine rumo ao poder supremo.</p>
+                <div class="expanded-content">
+                    <p><strong>Planeta:</strong> Naboo</p>
+                    <p><strong>Personagens Chave:</strong> Qui-Gon Jinn, Obi-Wan Kenobi, Yoda</p>
+                    <div class="info-box">Primeira aparição de Darth Maul com seu duplo sabre de luz.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event 3: Ataque dos Clones -->
+        <div class="timeline-item left visible" data-era="prequel" id="event-3">
+            <div class="timeline-content expandable">
+                <span class="date">22 BBY</span>
+                <h3>Início das Guerras Clônicas</h3>
+                <div class="media-container">
+                    <img src="images/Geonosis.png" alt="Geonosis" style="object-fit: cover;">
+                </div>
+                <div class="badge badge-event">Grande Batalha</div>
+                <p>A Batalha de Geonosis marca a mobilização do misterioso Exército de Clones da República contra os Separatistas, dando início a um conflito planejado secretamente para enfraquecer os Jedi.</p>
+                <div class="expanded-content">
+                    <p><strong>Localização:</strong> Geonosis - Arena Desértica</p>
+                    <p><strong>Adversários:</strong> Conde Dooku, Jango Fett</p>
+                    <div class="info-box">Primeira aparição em massa dos Clone Troopers - soldados clonados de Jango Fett.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event 4: Vingança dos Sith -->
+        <div class="timeline-item right visible" data-era="prequel" id="event-4">
+            <div class="timeline-content expandable">
+                <span class="date">19 BBY</span>
+                <h3>A Queda da República</h3>
+                <div class="media-container">
+                    <img src="images/Ordem66.png" alt="Ordem 66" style="object-fit: cover;">
+                </div>
+                <div class="badge badge-event">Evento Catastrófico</div>
+                <p>A execução da Ordem 66 destrói a Ordem Jedi. Anakin Skywalker sucumbe ao Lado Sombrio, tornando-se Darth Vader, enquanto Palpatine extingue a República e proclama o primeiro Império Galáctico.</p>
+                <div class="expanded-content">
+                    <p><strong>Localização:</strong> Templo Jedi, Coruscant</p>
+                    <p><strong>Transformação:</strong> Anakin → Darth Vader</p>
+                    <div class="info-box">Quase todos os Jedi são executados. Apenas alguns poucos, como Yoda e Obi-Wan, conseguem escapar.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event 5: Rogue One / Uma Nova Esperança -->
+        <div class="timeline-item left visible" data-era="original" id="event-5">
+            <div class="timeline-content expandable">
+                <span class="date">0 BBY</span>
+                <h3>A Batalha de Yavin</h3>
+                <div class="media-container">
+                    <img src="images/Yavin.png" alt="Estrela da Morte" style="object-fit: cover;">
+                </div>
+                <div class="badge badge-character">Luke Skywalker</div>
+                <div class="badge badge-event">Primeira Vitória</div>
+                <p>Após rebeldes roubarem os planos da Estrela da Morte, o jovem fazendeiro Luke Skywalker lidera o ataque para destruir a estação bélica do Império, marcando a primeira grande vitória da Aliança Rebelde.</p>
+                <div class="expanded-content">
+                    <p><strong>Localização:</strong> Yavin 4</p>
+                    <p><strong>Herói:</strong> Luke Skywalker (com ajuda da Força)</p>
+                    <div class="info-box">O ponto de referência para a cronologia de Star Wars. A Batalha de Yavin é o marco zero (BBY/ABY).</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event 6: Império Contra-Ataca -->
+        <div class="timeline-item right visible" data-era="original" id="event-6">
+            <div class="timeline-content expandable">
+                <span class="date">3 ABY</span>
+                <h3>O Confronto em Bespin</h3>
+                <div class="media-container">
+                    <img src="images/Bespin.png" alt="Cloud City" style="object-fit: cover;">
+                </div>
+                <div class="badge badge-character">Darth Vader</div>
+                <div class="badge badge-character">Luke Skywalker</div>
+                <p>Após a destruição da base em Hoth, Luke Skywalker treina com o mestre Yoda, mas é atraído por Darth Vader para uma armadilha em Cloud City, descobrindo a terrível verdade sobre seu parentesco.</p>
+                <div class="expanded-content">
+                    <p><strong>Localização:</strong> Cloud City (Bespin)</p>
+                    <p><strong>Revelação:</strong> "Eu sou seu pai" - uma das cenas mais icônicas do cinema</p>
+                    <div class="info-box">Luke perde a mão neste confronto e aprende a lidar com o peso da verdade.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event 7: Retorno de Jedi -->
+        <div class="timeline-item left visible" data-era="original" id="event-7">
+            <div class="timeline-content expandable">
+                <span class="date">4 ABY</span>
+                <h3>A Queda do Império</h3>
+                <div class="media-container">
+                    <img src="images/BatalhadeEndor.png" alt="Endor" style="object-fit: cover;">
+                </div>
+                <div class="badge badge-event">Redenção</div>
+                <p>Durante a Batalha de Endor, Luke enfrenta Darth Vader e o Imperador. Vader redime-se voltando-se contra Palpatine para salvar o filho. A segunda Estrela da Morte é destruída, e a liberdade retorna à galáxia.</p>
+                <div class="expanded-content">
+                    <p><strong>Localização:</strong> Endor e Morte Negra II</p>
+                    <p><strong>Momento Épico:</strong> Anakin Skywalker redime-se como Jedi</p>
+                    <div class="info-box">Final da Trilogia Original com a vitória da Rebelião sobre o Império.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event 8: O Despertar da Força -->
+        <div class="timeline-item right visible" data-era="sequel" id="event-8">
+            <div class="timeline-content expandable">
+                <span class="date">34 ABY</span>
+                <h3>A Ascensão da Primeira Ordem</h3>
+                <div class="media-container">
+                    <img src="images/PrimeiraOrdem.png" alt="Primeira Ordem" style="object-fit: cover;">
+                </div>
+                <div class="badge badge-character">Rey</div>
+                <div class="badge badge-character">Kylo Ren</div>
+                <p>Uma nova ameaça surge das cinzas do Império. Com a ajuda da Resistência, a catadora de lixo sensível à Força, Rey, e o desertor Finn combatem o temível Kylo Ren e destroem a base Starkiller.</p>
+                <div class="expanded-content">
+                    <p><strong>Localização:</strong> Tatooine, Takodana, Starkiller Base</p>
+                    <p><strong>Novos Heróis:</strong> Rey, Finn, Poe Dameron</p>
+                    <div class="info-box">A descoberta de Rey como nova Jedi marca o início de uma nova era para a Força.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event 9: A Ascensão Skywalker -->
+        <div class="timeline-item left visible" data-era="sequel" id="event-9">
+            <div class="timeline-content expandable">
+                <span class="date">35 ABY</span>
+                <h3>A Batalha de Exegol</h3>
+                <div class="media-container">
+                    <img src="images/BatalhadeExegol.png" alt="Exegol" style="object-fit: cover;">
+                </div>
+                <div class="badge badge-event">Confronto Final</div>
+                <p>O Imperador Palpatine retorna dos mortos no planeta oculto dos Sith. Rey e Ben Solo se unem para derrotá-lo em definitivo, restabelecendo a paz e honrando o legado dos Skywalker.</p>
+                <div class="expanded-content">
+                    <p><strong>Localização:</strong> Exegol - Planeta Sith Secreto</p>
+                    <p><strong>Desfecho:</strong> Redenção de Ben Solo, vitória de Rey</p>
+                    <div class="info-box">O fim da Saga Skywalker e o estabelecimento de uma nova ordem na galáxia.</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="">
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="modal">
+        <span class="modal-close" onclick="closeVideoModal()">&times;</span>
+        <div class="modal-content">
+            <iframe id="videoPlayer" width="100%" height="600" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <!-- Gallery Section -->
+    <section class="gallery-section">
+        <h2>Galeria: Momentos Memoráveis</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item" onclick="openImageModal('images/Jedi.png')">
+                <img src="images/Jedi.png" alt="Luke Skywalker">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-title">Jedi</div>
+                </div>
+            </div>
+            <div class="gallery-item" onclick="openImageModal('images/DarthVader.png')">
+                <img src="images/DarthVader.png" alt="Darth Vader">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-title">Darth Vader</div>
+                </div>
+            </div>
+            <div class="gallery-item" onclick="openImageModal('images/LukeSkywalker.png')">
+                <img src="images/LukeSkywalker.png" alt="Luke Skywalker">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-title">Luke Skywalker</div>
+                </div>
+            </div>
+            <div class="gallery-item" onclick="openImageModal('images/Rey.png')">
+                <img src="images/Rey.png" alt="Rey">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-title">Rey</div>
+                </div>
+            </div>
+            <div class="gallery-item" onclick="openImageModal('images/KyloRen.png')">
+                <img src="images/KyloRen.png" alt="Kylo Ren">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-title">Kylo Ren</div>
+                </div>
+            </div>
+            <div class="gallery-item" onclick="openImageModal('images/Força.png')">
+                <img src="images/Força.png" alt="A Força">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-title">A Força</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Que a Força esteja com você. Desenvolvido para a linha do tempo principal de <span>Star Wars</span>.</p>
+    </footer>
+
+    <script>
+        // Modal Functions
+        function openImageModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = imageSrc;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openVideoModal(videoId) {
+            const modal = document.getElementById('videoModal');
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.src = `https://www.youtube.com/embed/${videoId}`;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const imageModal = document.getElementById('imageModal');
+            const videoModal = document.getElementById('videoModal');
+            imageModal.classList.remove('show');
+            videoModal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeVideoModal() {
+            const videoModal = document.getElementById('videoModal');
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.src = '';
+            videoModal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside of it
+        window.addEventListener('click', (event) => {
+            const imageModal = document.getElementById('imageModal');
+            const videoModal = document.getElementById('videoModal');
+            if (event.target === imageModal) closeModal();
+            if (event.target === videoModal) closeVideoModal();
+        });
+
+        // Expandable Content Logic
+        const expandableContents = document.querySelectorAll('.timeline-content.expandable');
+        expandableContents.forEach(content => {
+            content.addEventListener('click', (e) => {
+                // Don't expand if clicking on media
+                if (e.target.closest('.media-container') || e.target.closest('.badge')) {
+                    return;
+                }
+                content.classList.toggle('expanded');
+            });
+        });
+
+        // Filtering Logic
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const timelineItems = document.querySelectorAll('.timeline-item');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+
+                const targetEra = button.getAttribute('data-era');
+
+                timelineItems.forEach(item => {
+                    const itemEra = item.getAttribute('data-era');
+                    if (targetEra === 'all' || itemEra === targetEra) {
+                        item.style.display = 'block';
+                        // Trigger fade in animation frame
+                        setTimeout(() => {
+                            item.classList.add('visible');
+                        }, 50);
+                    } else {
+                        item.classList.remove('visible');
+                        // Wait for fade out animation before hiding display
+                        setTimeout(() => {
+                            item.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+
+        // Scroll Animation (Fade-in on scroll)
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        timelineItems.forEach(item => {
+            observer.observe(item);
+        });
+
+        // Gallery items scroll animation
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        galleryItems.forEach(item => {
+            observer.observe(item);
+        });
+    </script>
+</body>
+</html>
